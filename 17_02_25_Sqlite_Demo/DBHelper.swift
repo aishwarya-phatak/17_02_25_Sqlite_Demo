@@ -37,10 +37,10 @@ final class DBHelper{
     }
     
     func createTable(){
-        let createQueryString = "CREATE TABLE IF NOT EXISTS Student(rollNumber INTEGER, name Text);"
+        let createQueryString = "CREATE TABLE IF NOT EXISTS Student1(rollnumber INTEGER, name Text);"
         var createStatement : OpaquePointer?
         
-        if sqlite3_prepare(db,
+        if sqlite3_prepare_v2(db,
                            createQueryString,
                            -1,
                            &createStatement,
@@ -51,4 +51,65 @@ final class DBHelper{
         }
         sqlite3_finalize(createStatement)
     }
+    
+    func insertStudentRecords(rN : Int, name : String){
+        let insertQueryString = "INSERT INTO Student1(rollnumber,name) VALUES(?,?);"
+        var insertStatement : OpaquePointer?
+        
+        if sqlite3_prepare_v2(db,
+                           insertQueryString,
+                           -1,
+                           &insertStatement,
+                           nil) == SQLITE_OK{
+            print("insert statement query prepared successfully")
+            
+            sqlite3_bind_int(insertStatement, 1, Int32(rN))
+        
+            sqlite3_bind_text(insertStatement,
+                              2,
+                              (name as NSString).utf8String,
+                              -1,
+                              nil)
+            
+            if sqlite3_step(insertStatement) == SQLITE_DONE{
+                print("insertion of student data is completed")
+            } else {
+                print("insertion of student data failed")
+            }
+        } else {
+            print("insert statement query preparation is unsuccessful")
+        }
+        sqlite3_finalize(insertStatement)
+    }
+
+    
+    func deleteStudentRecord(rn : Int){
+        let deleteQueryString = "DELETE FROM Student1 where rollnumber = ?;"
+        var deleteStatement : OpaquePointer?
+        
+        if sqlite3_prepare_v2(db,
+                              deleteQueryString,
+                              -1,
+                              &deleteStatement,
+                              nil) == SQLITE_OK{
+            print("delete statement preparation successful!")
+            
+            sqlite3_bind_int(deleteStatement, 1, Int32(rn))
+            
+            if sqlite3_step(deleteStatement) == SQLITE_DONE{
+                print("deletion successful!")
+            } else {
+                print("deletion unsuccessful!")
+            }
+        } else {
+            print("delete statement preparation Falied!")
+        }
+        
+        sqlite3_finalize(deleteStatement)
+    }
+    
+    func retriveStudentRecords(){
+        
+    }
+   
 }

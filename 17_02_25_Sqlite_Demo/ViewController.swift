@@ -12,9 +12,10 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        DBHelper.shared
+        DBHelper.shared.insertStudentRecords(rN: 102, name: "Sakshi")
+        DBHelper.shared.insertStudentRecords(rN: 103, name: "Suhaan")
+        DBHelper.shared.insertStudentRecords(rN: 104, name: "Pooja")
         
+        DBHelper.shared.deleteStudentRecord(rn: 102)
     }
-
-
 }
