@@ -14,6 +14,8 @@ final class DBHelper{
     var dbPath = "dbtest.sqlite"
     var db : OpaquePointer?
     
+    var students : [Student] = []
+    
     init(){
         db = createDatabase()
         createTable()
@@ -46,6 +48,12 @@ final class DBHelper{
                            &createStatement,
                            nil) == SQLITE_OK{
             print("Student table creation successful!")
+            
+            if sqlite3_step(createStatement) == SQLITE_DONE{
+                print("success")
+            } else {
+                print("failed")
+            }
         } else {
             print("Student table creation unsuccesful!")
         }
@@ -108,8 +116,34 @@ final class DBHelper{
         sqlite3_finalize(deleteStatement)
     }
     
-    func retriveStudentRecords(){
+    func retriveStudentRecords() -> [Student]{
+        let retriveQueryString = "SELECT * FROM Student1;"
+        var retriveStatement : OpaquePointer?
         
+        if sqlite3_prepare(db,
+                           retriveQueryString,
+                           -1,
+                           &retriveStatement,
+                           nil) == SQLITE_OK{
+            print("Retrive Statement prepared succesfully!")
+            
+            while sqlite3_step(retriveStatement) == SQLITE_ROW{
+                let extractedRollNumber = sqlite3_column_int(retriveStatement, 0)
+                let extractedName = String(describing:
+                                    String(cString:
+                                            sqlite3_column_text(retriveStatement, 1)
+                                          )
+                )
+                
+                let newObject = Student(
+                                        rollNumber: Int(extractedRollNumber),
+                                        name: extractedName
+                                )
+                self.students.append(newObject)
+            }
+        } else {
+            print("retrive Statement preparation Failed!")
+        }
+        return self.students
     }
-   
 }
